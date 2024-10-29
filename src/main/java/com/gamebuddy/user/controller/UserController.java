@@ -3,7 +3,6 @@ package com.gamebuddy.user.controller;
 import com.gamebuddy.user.dto.UserCreateDTO;
 import com.gamebuddy.user.dto.UserUpdateDTO;
 import com.gamebuddy.user.dto.UserViewDTO;
-import com.gamebuddy.user.dto.auth.LoginResponse;
 import com.gamebuddy.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,12 +40,15 @@ public class UserController {
     @Operation(summary = "Find a user by userName",
             description = "Finds user by userName and returns the user's details.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "User retrieved successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input data")
+            @ApiResponse(responseCode = "200", description = "User retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "User not found")
     })
-    @PostMapping("/find")
+    @GetMapping("/find")
     public ResponseEntity<UserViewDTO> findUser(@RequestParam String userName) {
         UserViewDTO foundUser = userService.findByUsername(userName);
+        if (foundUser == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Kullanıcı bulunamadığında 404 döndür
+        }
         return new ResponseEntity<>(foundUser, HttpStatus.OK);
     }
 
@@ -54,7 +56,7 @@ public class UserController {
     @PostMapping("/match-password")
     public ResponseEntity<Boolean> matchPassword(@RequestParam String username, @RequestParam String password) {
         Boolean matches = userService.matchPassword(username, password);
-        return new ResponseEntity<>(matches, HttpStatus.OK);
+        return new ResponseEntity<>(matches, HttpStatus.OK); // Eğer eşleşme yoksa 400 dönebilirsiniz
     }
 
     @Operation(summary = "Update user details",
@@ -94,6 +96,9 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserViewDTO>> getAllUsers() {
         List<UserViewDTO> userViewDTOs = userService.getAllUsers();
+        if (userViewDTOs.isEmpty()) {
+            return ResponseEntity.noContent().build(); // Kullanıcı yoksa 204 döndür
+        }
         return ResponseEntity.ok(userViewDTOs);
     }
 
@@ -113,13 +118,17 @@ public class UserController {
     @Operation(summary = "Get users by criteria.",
             description = "Retrieves a list of all registered users by criteria.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Users retrieved successfully"),
+            @ApiResponse(responseCode = "200", description = "Users retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "No users found")
     })
     @GetMapping("/by-criteria")
-    public List<UserViewDTO> getUsersByCriteria(@RequestParam(required = false) Integer minAge,
-                                                @RequestParam(required = false) Integer maxAge,
-                                                @RequestParam(required = false) List<String> genders) {
-        return userService.getUsersByCriteria(minAge, maxAge, genders);
+    public ResponseEntity<List<UserViewDTO>> getUsersByCriteria(@RequestParam(required = false) Integer minAge,
+                                                                @RequestParam(required = false) Integer maxAge,
+                                                                @RequestParam(required = false) List<String> genders) {
+        List<UserViewDTO> users = userService.getUsersByCriteria(minAge, maxAge, genders);
+        if (users.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Kullanıcı yoksa 404 döndür
+        }
+        return ResponseEntity.ok(users);
     }
 }
