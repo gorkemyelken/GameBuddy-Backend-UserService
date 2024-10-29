@@ -2,12 +2,10 @@ package com.gamebuddy.user.configuration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 
 @Configuration
-@EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -15,7 +13,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("*") // Tüm origin'lere izin ver
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // İzin verilen HTTP yöntemleri
                 .allowedHeaders("*") // İzin verilen başlıklar
-                .allowCredentials(true); // Kimlik bilgilerini kullanmaya izin ver
+                .allowCredentials(false); // Kimlik bilgilerini kullanmaya izin verme
     }
 }
+
 
