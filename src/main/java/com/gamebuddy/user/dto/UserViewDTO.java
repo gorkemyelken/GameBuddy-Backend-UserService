@@ -1,9 +1,11 @@
 package com.gamebuddy.user.dto;
 
 import com.gamebuddy.user.model.Gender;
+import com.gamebuddy.user.model.LanguagePreference;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 public class UserViewDTO {
@@ -16,4 +18,5 @@ public class UserViewDTO {
     private boolean isPremium;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Set<LanguagePreference> preferredLanguages;
 }

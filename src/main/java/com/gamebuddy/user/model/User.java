@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Data
@@ -37,4 +37,6 @@ public class User {
     private LocalDateTime updatedAt;
 
     private boolean isPremium = false;
+
+    private Set<LanguagePreference> preferredLanguages;
 }

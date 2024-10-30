@@ -3,7 +3,6 @@ package com.gamebuddy.user.service;
 import com.gamebuddy.user.dto.UserCreateDTO;
 import com.gamebuddy.user.dto.UserUpdateDTO;
 import com.gamebuddy.user.dto.UserViewDTO;
-import com.gamebuddy.user.dto.auth.LoginResponse;
 import com.gamebuddy.user.exception.UserNotFoundException;
 import com.gamebuddy.user.model.User;
 import com.gamebuddy.user.repository.UserRepository;
@@ -39,6 +38,7 @@ public class UserService {
         user.setProfilePhoto(null);
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(null);
+        user.setPreferredLanguages(null);
         userRepository.save(user);
         return modelMapper.map(user, UserViewDTO.class);
     }
@@ -46,9 +46,6 @@ public class UserService {
     public UserViewDTO findByUsername(String username) {
         User user = userRepository.findByUserName(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
-
-
-
         return modelMapper.map(user, UserViewDTO.class);
     }
 
@@ -76,7 +73,7 @@ public class UserService {
             user.setAge(userUpdateDTO.getAge());
         }
 
-        if (userUpdateDTO.getProfilePhoto() != null) {
+        if (userUpdateDTO.getProfilePhoto() != null && user.isPremium()) {
             user.setProfilePhoto(userUpdateDTO.getProfilePhoto());
         }
 

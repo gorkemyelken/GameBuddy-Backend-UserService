@@ -1,0 +1,37 @@
+package com.gamebuddy.user.model;
+
+public enum LanguagePreference {
+    ARABIC,
+    BENGALI,
+    CHINESE,
+    CZECH,
+    DANISH,
+    DUTCH,
+    ENGLISH,
+    FINNISH,
+    FRENCH,
+    GERMAN,
+    GREEK,
+    HEBREW,
+    HINDI,
+    HUNGARIAN,
+    INDONESIAN,
+    ITALIAN,
+    JAPANESE,
+    KOREAN,
+    MALAY,
+    NORWEGIAN,
+    PERSIAN,
+    POLISH,
+    PORTUGUESE,
+    ROMANIAN,
+    RUSSIAN,
+    SPANISH,
+    SWAHILI,
+    SWEDISH,
+    THAI,
+    TURKISH,
+    URDU,
+    VIETNAMESE
+}
+

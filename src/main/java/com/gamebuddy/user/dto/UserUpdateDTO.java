@@ -1,9 +1,12 @@
 package com.gamebuddy.user.dto;
 
 import com.gamebuddy.user.model.Gender;
+import com.gamebuddy.user.model.LanguagePreference;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+
+import java.util.Set;
 
 @Data
 public class UserUpdateDTO {
@@ -24,4 +27,6 @@ public class UserUpdateDTO {
     private String profilePhoto;
 
     private boolean isPremium;
+
+    private Set<LanguagePreference> preferredLanguages;
 }
