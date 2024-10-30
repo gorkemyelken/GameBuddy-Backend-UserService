@@ -171,15 +171,7 @@ public class UserService {
             return "Email already exists.";
         }
 
-        if (!isPasswordValid(userCreateDTO.getPassword())) {
-            return "Password must be between 8 and 16 characters.";
-        }
-
         return null;
-    }
-
-    private boolean isPasswordValid(String password) {
-        return password.length() >= 8 && password.length() <= 16;
     }
 
     private User createUser(UserCreateDTO userCreateDTO) {
