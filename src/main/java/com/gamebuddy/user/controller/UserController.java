@@ -45,7 +45,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
-    @GetMapping("/find")
+    @GetMapping("/findUser")
     public ResponseEntity<DataResult<UserViewDTO>> findUser(@RequestParam String userName) {
         return new ResponseEntity<>(userService.findByUsername(userName), HttpStatus.OK);
     }
