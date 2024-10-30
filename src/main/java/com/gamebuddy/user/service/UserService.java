@@ -3,6 +3,7 @@ package com.gamebuddy.user.service;
 import com.gamebuddy.user.dto.UserCreateDTO;
 import com.gamebuddy.user.dto.UserUpdateDTO;
 import com.gamebuddy.user.dto.UserViewDTO;
+import com.gamebuddy.user.dto.auth.RegisterResponse;
 import com.gamebuddy.user.exception.results.*;
 import com.gamebuddy.user.model.User;
 import com.gamebuddy.user.repository.UserRepository;
@@ -30,15 +31,16 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public DataResult<UserViewDTO> registerUser(UserCreateDTO userCreateDTO) {
+    public DataResult<RegisterResponse> registerUser(UserCreateDTO userCreateDTO) {
         String validationMessage = isValidUser(userCreateDTO);
         if (validationMessage != null) {
             return new ErrorDataResult<>(validationMessage);
         }
         User user = createUser(userCreateDTO);
         userRepository.save(user);
-        UserViewDTO userViewDTO = modelMapper.map(user, UserViewDTO.class);
-        return new SuccessDataResult<>(userViewDTO, "User added successfully.");
+        RegisterResponse registerResponse = new RegisterResponse();
+        registerResponse.setUserId(user.getUserId());
+        return new SuccessDataResult<>(registerResponse, "User added successfully.");
     }
 
     public DataResult<UserViewDTO> findByUsername(String username) {

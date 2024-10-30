@@ -3,6 +3,7 @@ package com.gamebuddy.user.controller;
 import com.gamebuddy.user.dto.UserCreateDTO;
 import com.gamebuddy.user.dto.UserUpdateDTO;
 import com.gamebuddy.user.dto.UserViewDTO;
+import com.gamebuddy.user.dto.auth.RegisterResponse;
 import com.gamebuddy.user.service.UserService;
 import com.gamebuddy.user.exception.results.DataResult;
 import com.gamebuddy.user.exception.results.Result;
@@ -34,7 +35,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
     @PostMapping("/register")
-    public ResponseEntity<DataResult<UserViewDTO>> registerUser(@RequestBody UserCreateDTO userCreateDTO) {
+    public ResponseEntity<DataResult<RegisterResponse>> registerUser(@RequestBody UserCreateDTO userCreateDTO) {
         return new ResponseEntity<>(userService.registerUser(userCreateDTO), HttpStatus.CREATED);
     }
 
