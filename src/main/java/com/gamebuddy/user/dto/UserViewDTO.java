@@ -9,7 +9,7 @@ import java.util.Set;
 
 @Data
 public class UserViewDTO {
-    private String id;
+    private String userId;
     private String userName;
     private String email;
     private Gender gender;

@@ -3,7 +3,7 @@ package com.gamebuddy.user.service;
 import com.gamebuddy.user.dto.UserCreateDTO;
 import com.gamebuddy.user.dto.UserUpdateDTO;
 import com.gamebuddy.user.dto.UserViewDTO;
-import com.gamebuddy.user.exception.UserNotFoundException;
+import com.gamebuddy.user.exception.results.*;
 import com.gamebuddy.user.model.User;
 import com.gamebuddy.user.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -30,28 +30,32 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UserViewDTO registerUser(UserCreateDTO userCreateDTO) {
-        User user = modelMapper.map(userCreateDTO, User.class);
-        user.setId(UUID.randomUUID().toString());
-        user.setPassword(userCreateDTO.getPassword());
-        user.setPremium(false);
-        user.setProfilePhoto(null);
-        user.setCreatedAt(LocalDateTime.now());
-        user.setUpdatedAt(null);
-        user.setPreferredLanguages(null);
+    public DataResult<UserViewDTO> registerUser(UserCreateDTO userCreateDTO) {
+        String validationMessage = isValidUser(userCreateDTO);
+        if (validationMessage != null) {
+            return new ErrorDataResult<>(validationMessage);
+        }
+        User user = createUser(userCreateDTO);
         userRepository.save(user);
-        return modelMapper.map(user, UserViewDTO.class);
+        UserViewDTO userViewDTO = modelMapper.map(user, UserViewDTO.class);
+        return new SuccessDataResult<>(userViewDTO, "User added successfully.");
     }
 
-    public UserViewDTO findByUsername(String username) {
-        User user = userRepository.findByUserName(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
-        return modelMapper.map(user, UserViewDTO.class);
+    public DataResult<UserViewDTO> findByUsername(String username) {
+        if(!checkIfUserNameExists(username)){
+            return new ErrorDataResult<>("User not found.");
+        }else{
+            User user = userRepository.findByUserName(username);
+            UserViewDTO userViewDTO = modelMapper.map(user, UserViewDTO.class);
+            return new SuccessDataResult<>(userViewDTO, "User found successfully.");
+        }
     }
 
-    public UserViewDTO updateUser(String userId, UserUpdateDTO userUpdateDTO) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+    public DataResult<UserViewDTO> updateUser(String userId, UserUpdateDTO userUpdateDTO) {
+        if(!checkIfUserIdExists(userId)){
+            return new ErrorDataResult<>("User not found.");
+        }
+        User user = userRepository.findByUserId(userId);
 
         if (userUpdateDTO.getUserName() != null) {
             user.setUserName(userUpdateDTO.getUserName());
@@ -78,60 +82,126 @@ public class UserService {
         }
 
         user.setUpdatedAt(LocalDateTime.now());
-
         userRepository.save(user);
-        return modelMapper.map(user, UserViewDTO.class);
+
+        UserViewDTO userViewDTO = modelMapper.map(user, UserViewDTO.class);
+        return new SuccessDataResult<>(userViewDTO, "User updated successfully.");
     }
 
-    public UserViewDTO getUserById(String userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
-        return modelMapper.map(user, UserViewDTO.class);
+    public DataResult<UserViewDTO> getUserByUserId(String userId) {
+        if(!checkIfUserIdExists(userId)){
+            return new ErrorDataResult<>("User not found.");
+        }
+        User user = userRepository.findByUserId(userId);
+        UserViewDTO userViewDTO = modelMapper.map(user, UserViewDTO.class);
+        return new SuccessDataResult<>(userViewDTO, "User found successfully.");
     }
 
-    public List<UserViewDTO> getAllUsers() {
+    public DataResult<List<UserViewDTO>> getAllUsers() {
         List<User> users = userRepository.findAll();
-        return users.stream()
+        if(users.isEmpty()){
+            return new ErrorDataResult<>("Users not found.");
+        }
+        List<UserViewDTO> userViewDTOs = users.stream()
                 .map(user -> modelMapper.map(user, UserViewDTO.class))
                 .collect(Collectors.toList());
+        return new SuccessDataResult<>(userViewDTOs, "All users retrieved successfully.");
     }
 
-    public void deleteUser(String userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException("User not found with id: " + userId);
+    public Result deleteUser(String userId) {
+        if(!checkIfUserIdExists(userId)){
+            return new ErrorResult("User not found.");
         }
         userRepository.deleteById(userId);
+        return new SuccessResult("User deleted " + userId);
     }
 
-    public UserViewDTO makeUserPremium(String userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
-
+    public DataResult<UserViewDTO> makeUserPremium(String userId) {
+        if(!checkIfUserIdExists(userId)){
+            return new ErrorDataResult<>("User not found.");
+        }
+        User user = userRepository.findByUserId(userId);
         user.setPremium(true);
         user.setUpdatedAt(LocalDateTime.now());
-
         userRepository.save(user);
-        return modelMapper.map(user, UserViewDTO.class);
+
+        UserViewDTO userViewDTO = modelMapper.map(user, UserViewDTO.class);
+        return new SuccessDataResult<>(userViewDTO, "User has been made premium.");
     }
 
-    public List<UserViewDTO> getUsersByCriteria(Integer minAge, Integer maxAge, List<String> genders) {
+    public DataResult<List<UserViewDTO>> getUsersByCriteria(Integer minAge, Integer maxAge, List<String> genders) {
         int effectiveMinAge = (minAge != null) ? minAge : 0;
         int effectiveMaxAge = (maxAge != null) ? maxAge : 100;
         List<String> effectiveGenders = (genders != null && !genders.isEmpty()) ? genders : List.of("MALE", "FEMALE", "OTHER");
 
         List<User> filteredUsers = userRepository.findByCriteria(effectiveMinAge, effectiveMaxAge, effectiveGenders);
+        if(filteredUsers.isEmpty()){
+            return new ErrorDataResult<>("Users not found.");
+        }
 
-        return filteredUsers.stream()
+        List<UserViewDTO> userViewDTOs = filteredUsers.stream()
                 .map(user -> modelMapper.map(user, UserViewDTO.class))
                 .collect(Collectors.toList());
+
+        return new SuccessDataResult<>(userViewDTOs, "Filtered users retrieved successfully.");
     }
 
-    public Boolean matchPassword(String username, String password) {
-        User user = userRepository.findByUserName(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
+    public Result matchPassword(String userName, String password) {
+        if(!checkIfUserNameExists(userName)){
+            return new ErrorResult("User not found.");
+        }
+        User user = userRepository.findByUserName(userName);
 
         boolean matches = passwordEncoder.matches(password, user.getPassword());
-        return matches;
+        if(matches){
+            return new SuccessResult();
+        }else{
+            return new ErrorResult();
+        }
+    }
+
+    private String isValidUser(UserCreateDTO userCreateDTO) {
+        if (checkIfUserNameExists(userCreateDTO.getUserName())) {
+            return "UserName already exists.";
+        }
+
+        if (checkIfEmailExists(userCreateDTO.getEmail())) {
+            return "Email already exists.";
+        }
+
+        if (!isPasswordValid(userCreateDTO.getPassword())) {
+            return "Password must be between 8 and 16 characters.";
+        }
+
+        return null;
+    }
+
+    private boolean isPasswordValid(String password) {
+        return password.length() >= 8 && password.length() <= 16;
+    }
+
+    private User createUser(UserCreateDTO userCreateDTO) {
+        User user = modelMapper.map(userCreateDTO, User.class);
+        user.setUserId(UUID.randomUUID().toString());
+        user.setPassword(userCreateDTO.getPassword());
+        user.setPremium(false);
+        user.setProfilePhoto(null);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(null);
+        user.setPreferredLanguages(null);
+        return user;
+    }
+
+    private boolean checkIfUserNameExists(String userName) {
+        return this.userRepository.existsByUserName(userName);
+    }
+
+    private boolean checkIfEmailExists(String email) {
+        return this.userRepository.existsByEmail(email);
+    }
+
+    private boolean checkIfUserIdExists(String userId) {
+        return this.userRepository.existsByUserId(userId);
     }
 }
 

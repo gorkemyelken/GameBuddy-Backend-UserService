@@ -2,8 +2,9 @@ package com.gamebuddy.user.service;
 
 import com.gamebuddy.user.dto.ReviewCreateDTO;
 import com.gamebuddy.user.dto.ReviewViewDTO;
-import com.gamebuddy.user.exception.ReviewNotFoundException;
+import com.gamebuddy.user.exception.results.*;
 import com.gamebuddy.user.model.Review;
+import com.gamebuddy.user.model.User;
 import com.gamebuddy.user.repository.ReviewRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,24 +25,46 @@ public class ReviewService {
         this.modelMapper = modelMapper;
     }
 
-    public ReviewViewDTO createReview(ReviewCreateDTO reviewCreateDTO) {
+    public DataResult<ReviewViewDTO> createReview(ReviewCreateDTO reviewCreateDTO) {
         Review review = modelMapper.map(reviewCreateDTO, Review.class);
-        review.setId(UUID.randomUUID().toString());
+        review.setReviewId(UUID.randomUUID().toString());
         review.setCreatedAt(LocalDateTime.now());
         reviewRepository.save(review);
-        return modelMapper.map(review, ReviewViewDTO.class);
+        ReviewViewDTO reviewViewDTO = modelMapper.map(review, ReviewViewDTO.class);
+        return new SuccessDataResult<>(reviewViewDTO, "Review created successfully.");
     }
 
-    public ReviewViewDTO getReviewById(String reviewId) {
-        Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new ReviewNotFoundException("Review not found with id: " + reviewId));
-        return modelMapper.map(review, ReviewViewDTO.class);
+    public DataResult<ReviewViewDTO> getReviewByReviewId(String reviewId) {
+        if(!checkIfReviewIdExists(reviewId)){
+            return new ErrorDataResult<>("Review not found.");
+        }
+        Review review = reviewRepository.findByReviewId(reviewId);
+        ReviewViewDTO reviewViewDTO = modelMapper.map(review, ReviewViewDTO.class);
+        return new SuccessDataResult<>(reviewViewDTO, "Review found successfully.");
     }
 
-    public void deleteReview(String reviewId) {
-        if (!reviewRepository.existsById(reviewId)) {
-            throw new ReviewNotFoundException("Review not found with id: " + reviewId);
+    public Result deleteReview(String reviewId) {
+        if (!checkIfReviewIdExists(reviewId)) {
+            return new ErrorResult("Review not found with id: " + reviewId);
         }
         reviewRepository.deleteById(reviewId);
+        return new SuccessResult("Review deleted successfully.");
+    }
+
+    public DataResult<ReviewViewDTO> getReviewByReviewedUserId(String reviewedUserId){
+        if(!checkIfReviewedUserIdExists(reviewedUserId)){
+            return new ErrorDataResult<>("Review not found.");
+        }
+        Review review = reviewRepository.findByReviewedUserId(reviewedUserId);
+        ReviewViewDTO reviewViewDTO = modelMapper.map(review, ReviewViewDTO.class);
+        return new SuccessDataResult<>(reviewViewDTO, "Review found successfully.");
+    }
+
+    private boolean checkIfReviewedUserIdExists(String reviewedUserId) {
+        return this.reviewRepository.existsByReviewedUserId(reviewedUserId);
+    }
+
+    private boolean checkIfReviewIdExists(String reviewId) {
+        return this.reviewRepository.existsByReviewId(reviewId);
     }
 }

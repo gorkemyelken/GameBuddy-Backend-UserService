@@ -16,7 +16,7 @@ public class User {
 
     @Id
     @Column(updatable = false, nullable = false)
-    private String id;
+    private String userId;
 
     @Column(unique = true)
     private String userName;

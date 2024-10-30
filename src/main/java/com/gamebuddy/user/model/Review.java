@@ -17,7 +17,7 @@ public class Review {
 
     @Id
     @Column(updatable = false, nullable = false)
-    private String id;
+    private String reviewId;
 
     private String reviewerUserId;
 

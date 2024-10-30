@@ -4,6 +4,8 @@ import com.gamebuddy.user.dto.UserCreateDTO;
 import com.gamebuddy.user.dto.UserUpdateDTO;
 import com.gamebuddy.user.dto.UserViewDTO;
 import com.gamebuddy.user.service.UserService;
+import com.gamebuddy.user.exception.results.DataResult;
+import com.gamebuddy.user.exception.results.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,9 +34,8 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
     @PostMapping("/register")
-    public ResponseEntity<UserViewDTO> registerUser(@RequestBody UserCreateDTO userCreateDTO) {
-        UserViewDTO createdUser = userService.registerUser(userCreateDTO);
-        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+    public ResponseEntity<DataResult<UserViewDTO>> registerUser(@RequestBody UserCreateDTO userCreateDTO) {
+        return new ResponseEntity<>(userService.registerUser(userCreateDTO), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Find a user by userName",
@@ -44,19 +45,14 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @GetMapping("/find")
-    public ResponseEntity<UserViewDTO> findUser(@RequestParam String userName) {
-        UserViewDTO foundUser = userService.findByUsername(userName);
-        if (foundUser == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Kullanıcı bulunamadığında 404 döndür
-        }
-        return new ResponseEntity<>(foundUser, HttpStatus.OK);
+    public ResponseEntity<DataResult<UserViewDTO>> findUser(@RequestParam String userName) {
+        return new ResponseEntity<>(userService.findByUsername(userName), HttpStatus.OK);
     }
 
     @Operation(summary = "Match password with the stored hash")
     @PostMapping("/match-password")
-    public ResponseEntity<Boolean> matchPassword(@RequestParam String username, @RequestParam String password) {
-        Boolean matches = userService.matchPassword(username, password);
-        return new ResponseEntity<>(matches, HttpStatus.OK); // Eğer eşleşme yoksa 400 dönebilirsiniz
+    public ResponseEntity<Result> matchPassword(@RequestParam String userName, @RequestParam String password) {
+        return new ResponseEntity<>(userService.matchPassword(userName, password), HttpStatus.OK);
     }
 
     @Operation(summary = "Update user details",
@@ -66,12 +62,11 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
-    @PutMapping("/{id}")
-    public ResponseEntity<UserViewDTO> updateUser(
-            @Parameter(description = "ID of the user to be updated") @PathVariable String id,
+    @PutMapping("/{userId}")
+    public ResponseEntity<DataResult<UserViewDTO>> updateUser(
+            @Parameter(description = "ID of the user to be updated") @PathVariable String userId,
             @RequestBody UserUpdateDTO userUpdateDTO) {
-        UserViewDTO updatedUser = userService.updateUser(id, userUpdateDTO);
-        return ResponseEntity.ok(updatedUser);
+        return new ResponseEntity<>(userService.updateUser(userId, userUpdateDTO), HttpStatus.OK);
     }
 
     @Operation(summary = "Get user by ID",
@@ -80,11 +75,10 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User found"),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
-    @GetMapping("/{id}")
-    public ResponseEntity<UserViewDTO> getUserById(
-            @Parameter(description = "ID of the user to be retrieved") @PathVariable String id) {
-        UserViewDTO userViewDTO = userService.getUserById(id);
-        return ResponseEntity.ok(userViewDTO);
+    @GetMapping("/{userId}")
+    public ResponseEntity<DataResult<UserViewDTO>> getUserById(
+            @Parameter(description = "ID of the user to be retrieved") @PathVariable String userId) {
+        return new ResponseEntity<>(userService.getUserByUserId(userId), HttpStatus.OK);
     }
 
     @Operation(summary = "Get all users",
@@ -94,12 +88,8 @@ public class UserController {
             @ApiResponse(responseCode = "204", description = "No users found")
     })
     @GetMapping
-    public ResponseEntity<List<UserViewDTO>> getAllUsers() {
-        List<UserViewDTO> userViewDTOs = userService.getAllUsers();
-        if (userViewDTOs.isEmpty()) {
-            return ResponseEntity.noContent().build(); // Kullanıcı yoksa 204 döndür
-        }
-        return ResponseEntity.ok(userViewDTOs);
+    public ResponseEntity<DataResult<List<UserViewDTO>>> getAllUsers() {
+        return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
     @Operation(summary = "Delete a user",
@@ -108,11 +98,10 @@ public class UserController {
             @ApiResponse(responseCode = "204", description = "User deleted successfully"),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(
-            @Parameter(description = "ID of the user to be deleted") @PathVariable String id) {
-        userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Result> deleteUser(
+            @Parameter(description = "ID of the user to be deleted") @PathVariable String userId) {
+        return new ResponseEntity<>(userService.deleteUser(userId), HttpStatus.OK);
     }
 
     @Operation(summary = "Get users by criteria.",
@@ -122,13 +111,9 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "No users found")
     })
     @GetMapping("/by-criteria")
-    public ResponseEntity<List<UserViewDTO>> getUsersByCriteria(@RequestParam(required = false) Integer minAge,
+    public ResponseEntity<DataResult<List<UserViewDTO>>> getUsersByCriteria(@RequestParam(required = false) Integer minAge,
                                                                 @RequestParam(required = false) Integer maxAge,
                                                                 @RequestParam(required = false) List<String> genders) {
-        List<UserViewDTO> users = userService.getUsersByCriteria(minAge, maxAge, genders);
-        if (users.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Kullanıcı yoksa 404 döndür
-        }
-        return ResponseEntity.ok(users);
+        return new ResponseEntity<>(userService.getUsersByCriteria(minAge, maxAge, genders), HttpStatus.OK);
     }
 }

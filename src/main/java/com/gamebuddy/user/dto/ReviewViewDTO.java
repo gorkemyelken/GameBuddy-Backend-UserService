@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Data
 public class ReviewViewDTO {
-    private String id;
+    private String reviewId;
     private String reviewerUserId;
     private String reviewedUserId;
     private int rating;

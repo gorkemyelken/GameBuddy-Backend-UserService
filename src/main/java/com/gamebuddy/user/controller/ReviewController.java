@@ -2,6 +2,8 @@ package com.gamebuddy.user.controller;
 
 import com.gamebuddy.user.dto.ReviewCreateDTO;
 import com.gamebuddy.user.dto.ReviewViewDTO;
+import com.gamebuddy.user.exception.results.DataResult;
+import com.gamebuddy.user.exception.results.Result;
 import com.gamebuddy.user.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,9 +33,8 @@ public class ReviewController {
             @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
     @PostMapping
-    public ResponseEntity<ReviewViewDTO> createReview(@RequestBody ReviewCreateDTO reviewCreateDTO) {
-        ReviewViewDTO createdReview = reviewService.createReview(reviewCreateDTO);
-        return new ResponseEntity<>(createdReview, HttpStatus.CREATED);
+    public ResponseEntity<DataResult<ReviewViewDTO>> createReview(@RequestBody ReviewCreateDTO reviewCreateDTO) {
+        return new ResponseEntity<>(reviewService.createReview(reviewCreateDTO), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Get review by ID",
@@ -42,11 +43,10 @@ public class ReviewController {
             @ApiResponse(responseCode = "200", description = "Review found"),
             @ApiResponse(responseCode = "404", description = "Review not found")
     })
-    @GetMapping("/{id}")
-    public ResponseEntity<ReviewViewDTO> getReviewById(
-            @Parameter(description = "ID of the review to be retrieved") @PathVariable String id) {
-        ReviewViewDTO reviewViewDTO = reviewService.getReviewById(id);
-        return ResponseEntity.ok(reviewViewDTO);
+    @GetMapping("/{reviewId}")
+    public ResponseEntity<DataResult<ReviewViewDTO>> getReviewByReviewId(
+            @Parameter(description = "ID of the review to be retrieved") @PathVariable String reviewId) {
+        return new ResponseEntity<>(reviewService.getReviewByReviewId(reviewId), HttpStatus.OK);
     }
 
     @Operation(summary = "Delete review",
@@ -55,9 +55,8 @@ public class ReviewController {
             @ApiResponse(responseCode = "204", description = "Review deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Review not found")
     })
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReview(@Parameter(description = "ID of the review to be deleted") @PathVariable String id) {
-        reviewService.deleteReview(id);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<Result> deleteReview(@Parameter(description = "ID of the review to be deleted") @PathVariable String reviewId) {
+        return new ResponseEntity<>(reviewService.deleteReview(reviewId), HttpStatus.OK);
     }
 }
