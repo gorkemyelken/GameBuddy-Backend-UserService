@@ -83,6 +83,10 @@ public class UserService {
             user.setProfilePhoto(userUpdateDTO.getProfilePhoto());
         }
 
+        if(userUpdateDTO.getPreferredLanguages() != null){
+            user.setPreferredLanguages(userUpdateDTO.getPreferredLanguages());
+        }
+
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
 
