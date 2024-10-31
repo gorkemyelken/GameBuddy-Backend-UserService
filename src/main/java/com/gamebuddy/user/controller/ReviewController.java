@@ -69,6 +69,6 @@ public class ReviewController {
     @GetMapping("/users/{reviewedUserId}")
     public ResponseEntity<DataResult<ReviewViewDTO>> getReviewByReviewedUserId(
             @Parameter(description = "ID of the reviewedUsedId to be retrieved") @PathVariable String reviewedUserId) {
-        return new ResponseEntity<>(reviewService.getReviewByReviewId(reviewedUserId), HttpStatus.OK);
+        return new ResponseEntity<>(reviewService.getReviewByReviewedUserId(reviewedUserId), HttpStatus.OK);
     }
 }
