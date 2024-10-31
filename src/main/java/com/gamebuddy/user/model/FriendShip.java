@@ -11,17 +11,19 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true) // Use only explicitly included fields
 public class FriendShip {
 
     @Id
     @Column(updatable = false, nullable = false)
+    @EqualsAndHashCode.Include // Include friendShipId in hashCode/equals
     private String friendShipId;
 
+    @EqualsAndHashCode.Include // Include friendId in hashCode/equals
     private String friendId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
-    @JsonIgnore
+    @JsonIgnore // Prevent serialization issues
     private User user;
 }

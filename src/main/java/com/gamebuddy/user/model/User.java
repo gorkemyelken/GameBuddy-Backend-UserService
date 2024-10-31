@@ -16,37 +16,33 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer","handler","friendShips"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true) // Use only explicitly included fields
 public class User {
 
     @Id
     @Column(updatable = false, nullable = false)
+    @EqualsAndHashCode.Include // Include userId in hashCode/equals
     private String userId;
 
     @Column(unique = true)
+    @EqualsAndHashCode.Include // Include userName in hashCode/equals
     private String userName;
 
     private String email;
-
     private String password;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
-
     private int age;
-
     private String profilePhoto;
-
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
-
     private boolean isPremium = false;
 
     private Set<LanguagePreference> preferredLanguages;
-
     private Float averageRating;
 
     @OneToMany(mappedBy = "user")
-    @JsonIgnore
+    @JsonIgnore // Prevent serialization issues
     private Set<FriendShip> friendShips;
 }
