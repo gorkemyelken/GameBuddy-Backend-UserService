@@ -75,21 +75,33 @@ public class UserService {
         return new SuccessResult("Friendship completed.");
     }
 
-    public DataResult<List<UserViewDTO>> getFriends(String userId){
-        LOGGER.info("[getFriends] UserId: {}",userId);
+    public DataResult<List<UserViewDTO>> getFriends(String userId) {
+        LOGGER.info("[getFriends] UserId: {}", userId);
+
         Set<FriendShip> friendShips = friendRepository.findByUser_UserId(userId);
 
-        List<User> friendList = new ArrayList<>();
-        for (FriendShip friendShip : friendShips){
-            User user = this.userRepository.findByUserId(friendShip.getFriendShipId());
-            friendList.add(user);
+        if (friendShips.isEmpty()) {
+            LOGGER.info("No friends found for UserId: {}", userId);
+            return new SuccessDataResult<>(new ArrayList<>(), "No friends found.");
         }
+
+        List<User> friendList = new ArrayList<>();
+        for (FriendShip friendShip : friendShips) {
+            User user = this.userRepository.findByUserId(friendShip.getFriendId()); 
+            if (user != null) {
+                friendList.add(user);
+            } else {
+                LOGGER.warn("User not found for FriendShipId: {}", friendShip.getFriendId());
+            }
+        }
+
         List<UserViewDTO> userViewDTOs = friendList.stream()
                 .map(user -> modelMapper.map(user, UserViewDTO.class))
                 .collect(Collectors.toList());
-        return new SuccessDataResult<>(userViewDTOs, "All friends retrieved successfully.");
 
+        return new SuccessDataResult<>(userViewDTOs, "All friends retrieved successfully.");
     }
+
 
     private void createAndSaveFriendship(User user, String friendId) {
         FriendShip newFriendship = new FriendShip();
