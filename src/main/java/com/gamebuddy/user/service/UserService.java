@@ -1,12 +1,15 @@
 package com.gamebuddy.user.service;
 
+import com.gamebuddy.user.dto.FriendCreateDTO;
 import com.gamebuddy.user.dto.UserCreateDTO;
 import com.gamebuddy.user.dto.UserUpdateDTO;
 import com.gamebuddy.user.dto.UserViewDTO;
 import com.gamebuddy.user.dto.auth.RegisterResponse;
 import com.gamebuddy.user.exception.results.*;
+import com.gamebuddy.user.model.Friend;
 import com.gamebuddy.user.model.Gender;
 import com.gamebuddy.user.model.User;
+import com.gamebuddy.user.repository.FriendRepository;
 import com.gamebuddy.user.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -14,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,12 +29,15 @@ public class UserService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
+
+    private final FriendRepository friendRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, FriendRepository friendRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.friendRepository = friendRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
     }
@@ -48,6 +55,27 @@ public class UserService {
         RegisterResponse registerResponse = new RegisterResponse();
         registerResponse.setUserId(user.getUserId());
         return new SuccessDataResult<>(registerResponse, "User added successfully.");
+    }
+
+    @Transactional
+    public Result addFriend(String userId, FriendCreateDTO friendCreateDTO) {
+        User user = userRepository.findByUserId(userId);
+
+        User friend = userRepository.findByUserId(friendCreateDTO.getFriendId());
+
+        if (user == null || friend == null) {
+            throw new RuntimeException("User or Friend not found");
+        }
+
+        Friend newFriendship = new Friend();
+        newFriendship.setUser(user);
+        newFriendship.setFriendId(friendCreateDTO.getFriendId());
+
+        user.getFriends().add(newFriendship);
+
+        friendRepository.save(newFriendship);
+        userRepository.save(user);
+        return new SuccessResult("Friendship completed.");
     }
 
     public DataResult<UserViewDTO> findByUsername(String userName) {

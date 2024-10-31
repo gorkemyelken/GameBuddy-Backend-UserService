@@ -1,5 +1,6 @@
 package com.gamebuddy.user.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -41,4 +42,8 @@ public class User {
     private Set<LanguagePreference> preferredLanguages;
 
     private Float averageRating;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private Set<Friend> friends;
 }

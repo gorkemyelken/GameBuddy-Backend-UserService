@@ -1,5 +1,6 @@
 package com.gamebuddy.user.controller;
 
+import com.gamebuddy.user.dto.FriendCreateDTO;
 import com.gamebuddy.user.dto.UserCreateDTO;
 import com.gamebuddy.user.dto.UserUpdateDTO;
 import com.gamebuddy.user.dto.UserViewDTO;
@@ -118,5 +119,15 @@ public class UserController {
                                                                             @RequestParam(required = false) Float maxRating,
                                                                             @RequestParam(required = false) List<String> genders) {
         return new ResponseEntity<>(userService.getUsersByCriteria(minAge, maxAge, minRating, maxRating, genders), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Add friend",
+            description = "Adds the friend.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Friend added successfully"),
+    })
+    @PostMapping("/{userId}/add-friend")
+    public ResponseEntity<Result> addFriend(@PathVariable String userId, @RequestBody FriendCreateDTO friendCreateDTO) {
+        return new ResponseEntity<>(userService.addFriend(userId, friendCreateDTO), HttpStatus.OK);
     }
 }
