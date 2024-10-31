@@ -19,5 +19,5 @@ public class UserViewDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Set<LanguagePreference> preferredLanguages;
-    private Float averageRating;
+    private Integer averageRating;
 }
