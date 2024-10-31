@@ -45,5 +45,5 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
-    private Set<Friend> friends;
+    private Set<FriendShip> friendShips;
 }

@@ -6,7 +6,7 @@ import com.gamebuddy.user.dto.UserUpdateDTO;
 import com.gamebuddy.user.dto.UserViewDTO;
 import com.gamebuddy.user.dto.auth.RegisterResponse;
 import com.gamebuddy.user.exception.results.*;
-import com.gamebuddy.user.model.Friend;
+import com.gamebuddy.user.model.FriendShip;
 import com.gamebuddy.user.model.Gender;
 import com.gamebuddy.user.model.User;
 import com.gamebuddy.user.repository.FriendRepository;
@@ -64,18 +64,24 @@ public class UserService {
         User friend = userRepository.findByUserId(friendCreateDTO.getFriendId());
 
         if (user == null || friend == null) {
-            throw new RuntimeException("User or Friend not found");
+            throw new RuntimeException("User or FriendShip not found");
         }
 
-        Friend newFriendship = new Friend();
+        createAndSaveFriendship(user, friendCreateDTO.getFriendId());
+        createAndSaveFriendship(friend, friendCreateDTO.getUserId());
+
+        return new SuccessResult("Friendship completed.");
+    }
+
+    private void createAndSaveFriendship(User user, String friendId) {
+        FriendShip newFriendship = new FriendShip();
+        newFriendship.setFriendShipId(UUID.randomUUID().toString());
         newFriendship.setUser(user);
-        newFriendship.setFriendId(friendCreateDTO.getFriendId());
+        newFriendship.setFriendId(friendId);
 
-        user.getFriends().add(newFriendship);
-
+        user.getFriendShips().add(newFriendship);
         friendRepository.save(newFriendship);
         userRepository.save(user);
-        return new SuccessResult("Friendship completed.");
     }
 
     public DataResult<UserViewDTO> findByUsername(String userName) {

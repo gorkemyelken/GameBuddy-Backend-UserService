@@ -10,10 +10,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Friend {
+public class FriendShip {
 
     @Id
     @Column(updatable = false, nullable = false)
+    private String friendShipId;
+
     private String friendId;
 
     @ManyToOne(fetch = FetchType.LAZY)
