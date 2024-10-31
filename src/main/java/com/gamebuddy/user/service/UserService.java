@@ -8,6 +8,8 @@ import com.gamebuddy.user.exception.results.*;
 import com.gamebuddy.user.model.User;
 import com.gamebuddy.user.repository.UserRepository;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
@@ -32,6 +35,7 @@ public class UserService {
     }
 
     public DataResult<RegisterResponse> registerUser(UserCreateDTO userCreateDTO) {
+        LOGGER.info("Register User start.");
         String validationMessage = isValidUser(userCreateDTO);
         if (validationMessage != null) {
             return new ErrorDataResult<>(validationMessage);
@@ -59,20 +63,18 @@ public class UserService {
         }
         User user = userRepository.findByUserId(userId);
 
-        if (userUpdateDTO.getUserName() != null) {
-            user.setUserName(userUpdateDTO.getUserName());
-        }
-
-        if (userUpdateDTO.getEmail() != null) {
-            user.setEmail(userUpdateDTO.getEmail());
-        }
-
         if (userUpdateDTO.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(userUpdateDTO.getPassword()));
         }
 
         if (userUpdateDTO.getGender() != null) {
             user.setGender(userUpdateDTO.getGender());
+            if(user.getGender().equals("MALE")){
+                user.setProfilePhoto("https://yyamimarlik.s3.eu-north-1.amazonaws.com/Male+Avatar.jpeg");
+            }
+            if(user.getGender().equals("FEMALE")){
+                user.setProfilePhoto("https://yyamimarlik.s3.eu-north-1.amazonaws.com/Female+Avatar.jpeg");
+            }
         }
 
         if (userUpdateDTO.getAge() != null) {
