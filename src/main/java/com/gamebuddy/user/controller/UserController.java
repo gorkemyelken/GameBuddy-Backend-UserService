@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +36,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
     @PostMapping("/register")
-    public ResponseEntity<DataResult<RegisterResponse>> registerUser(@RequestBody UserCreateDTO userCreateDTO) {
+    public ResponseEntity<DataResult<RegisterResponse>> registerUser(@Valid @RequestBody UserCreateDTO userCreateDTO) {
         return new ResponseEntity<>(userService.registerUser(userCreateDTO), HttpStatus.CREATED);
     }
 
