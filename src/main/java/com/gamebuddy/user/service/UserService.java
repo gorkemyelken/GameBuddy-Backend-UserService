@@ -186,6 +186,10 @@ public class UserService {
     }
 
     private String isValidUser(UserCreateDTO userCreateDTO) {
+        if(checkIfEmailValid(userCreateDTO.getEmail())){
+            return "Email not valid.";
+        }
+
         if (checkIfUserNameExists(userCreateDTO.getUserName())) {
             return "UserName already exists.";
         }
@@ -220,5 +224,11 @@ public class UserService {
     private boolean checkIfUserIdExists(String userId) {
         return this.userRepository.existsByUserId(userId);
     }
+
+    private boolean checkIfEmailValid(String email) {
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        return email != null && email.matches(emailRegex);
+    }
+
 }
 
