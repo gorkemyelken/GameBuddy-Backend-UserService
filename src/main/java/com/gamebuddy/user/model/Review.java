@@ -21,7 +21,7 @@ public class Review {
 
     private String reviewedUserId;
 
-    private int rating;
+    private Float rating;
 
     private String comment;
 

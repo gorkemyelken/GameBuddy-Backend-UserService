@@ -27,8 +27,8 @@ public interface UserRepository extends JpaRepository<User, String> {
             "(u.age >= :minAge) AND " +
             "(u.age <= :maxAge) AND " +
             "(:genders IS NULL OR u.gender IN :genders) AND " +
-            "(u.rating >= :minRating) AND " +
-            "(u.rating <= :maxRating)")
+            "(u.averageRating >= :minRating) AND " +
+            "(u.averageRating <= :maxRating)")
     List<User> findByCriteria(@Param("minAge") Integer minAge,
                               @Param("maxAge") Integer maxAge,
                               @Param("minRating") Float minRating,

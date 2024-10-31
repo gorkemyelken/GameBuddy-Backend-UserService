@@ -39,4 +39,6 @@ public class User {
     private boolean isPremium = false;
 
     private Set<LanguagePreference> preferredLanguages;
+
+    private Float averageRating;
 }
