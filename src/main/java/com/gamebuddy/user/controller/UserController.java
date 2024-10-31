@@ -126,7 +126,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "FriendShip added successfully"),
     })
-    @PostMapping("/users/add-friend")
+    @PostMapping("/add-friend")
     public ResponseEntity<Result> addFriend(@RequestBody FriendCreateDTO friendCreateDTO) {
         return new ResponseEntity<>(userService.addFriend(friendCreateDTO), HttpStatus.OK);
     }

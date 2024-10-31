@@ -57,14 +57,15 @@ public class UserService {
         return new SuccessDataResult<>(registerResponse, "User added successfully.");
     }
 
-    @Transactional
     public Result addFriend(FriendCreateDTO friendCreateDTO) {
+        LOGGER.info("[addFriend] FriendCreateDTO: {}",friendCreateDTO);
         User user = userRepository.findByUserId(friendCreateDTO.getUserId());
-
+        LOGGER.info("[addFriend] User: {}",user);
         User friend = userRepository.findByUserId(friendCreateDTO.getFriendId());
+        LOGGER.info("[addFriend] Friend: {}",friend);
 
         if (user == null || friend == null) {
-            throw new RuntimeException("User or FriendShip not found");
+            return new ErrorResult("User not found.");
         }
 
         createAndSaveFriendship(user, friendCreateDTO.getFriendId());
