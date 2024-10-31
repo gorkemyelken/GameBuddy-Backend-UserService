@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/reviews")
 @CrossOrigin
@@ -67,8 +69,8 @@ public class ReviewController {
             @ApiResponse(responseCode = "404", description = "Review not found")
     })
     @GetMapping("/users/{reviewedUserId}")
-    public ResponseEntity<DataResult<ReviewViewDTO>> getReviewByReviewedUserId(
+    public ResponseEntity<DataResult<List<ReviewViewDTO>>> getReviewByReviewedUserId(
             @Parameter(description = "ID of the reviewedUsedId to be retrieved") @PathVariable String reviewedUserId) {
-        return new ResponseEntity<>(reviewService.getReviewByReviewedUserId(reviewedUserId), HttpStatus.OK);
+        return new ResponseEntity<>(reviewService.getReviewsByReviewedUserId(reviewedUserId), HttpStatus.OK);
     }
 }

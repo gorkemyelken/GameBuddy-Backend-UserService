@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ReviewService {
@@ -57,14 +59,16 @@ public class ReviewService {
         return new SuccessResult("Review deleted successfully.");
     }
 
-    public DataResult<ReviewViewDTO> getReviewByReviewedUserId(String reviewedUserId){
-        LOGGER.info("[getReviewByReviewedUserId] ReviewedUserId: {}",reviewedUserId);
+    public DataResult<List<ReviewViewDTO>> getReviewsByReviewedUserId(String reviewedUserId){
+        LOGGER.info("[getReviewsByReviewedUserId] ReviewedUserId: {}",reviewedUserId);
         if(!checkIfReviewedUserIdExists(reviewedUserId)){
             return new ErrorDataResult<>("ReviewedUser not found.");
         }
-        Review review = reviewRepository.findByReviewedUserId(reviewedUserId);
-        ReviewViewDTO reviewViewDTO = modelMapper.map(review, ReviewViewDTO.class);
-        return new SuccessDataResult<>(reviewViewDTO, "Review found successfully.");
+        List<Review> reviews = reviewRepository.findReviewsByReviewedUserId(reviewedUserId);
+        List<ReviewViewDTO> reviewViewDTOs = reviews.stream()
+                .map(review -> modelMapper.map(review, ReviewViewDTO.class))
+                .collect(Collectors.toList());
+        return new SuccessDataResult<>(reviewViewDTOs, "Reviews found successfully.");
     }
 
     private boolean checkIfReviewedUserIdExists(String reviewedUserId) {
