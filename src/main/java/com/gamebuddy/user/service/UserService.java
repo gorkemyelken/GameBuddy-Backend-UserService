@@ -153,12 +153,14 @@ public class UserService {
         return new SuccessDataResult<>(userViewDTO, "User has been made premium.");
     }
 
-    public DataResult<List<UserViewDTO>> getUsersByCriteria(Integer minAge, Integer maxAge, List<String> genders) {
+    public DataResult<List<UserViewDTO>> getUsersByCriteria(Integer minAge, Integer maxAge, Float minRating, Float maxRating, List<String> genders) {
         int effectiveMinAge = (minAge != null) ? minAge : 0;
         int effectiveMaxAge = (maxAge != null) ? maxAge : 100;
+        float effectiveMinRating = (minRating != null) ? minRating : 0;
+        float effectiveMaxRating = (maxRating != null) ? maxRating : 5;
         List<String> effectiveGenders = (genders != null && !genders.isEmpty()) ? genders : List.of("MALE", "FEMALE", "OTHER");
 
-        List<User> filteredUsers = userRepository.findByCriteria(effectiveMinAge, effectiveMaxAge, effectiveGenders);
+        List<User> filteredUsers = userRepository.findByCriteria(effectiveMinAge, effectiveMaxAge, effectiveMinRating, effectiveMaxRating, effectiveGenders);
         if(filteredUsers.isEmpty()){
             return new ErrorDataResult<>("Users not found.");
         }

@@ -4,14 +4,13 @@ import com.gamebuddy.user.dto.UserCreateDTO;
 import com.gamebuddy.user.dto.UserUpdateDTO;
 import com.gamebuddy.user.dto.UserViewDTO;
 import com.gamebuddy.user.dto.auth.RegisterResponse;
-import com.gamebuddy.user.service.UserService;
 import com.gamebuddy.user.exception.results.DataResult;
 import com.gamebuddy.user.exception.results.Result;
+import com.gamebuddy.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -114,8 +113,10 @@ public class UserController {
     })
     @GetMapping("/by-criteria")
     public ResponseEntity<DataResult<List<UserViewDTO>>> getUsersByCriteria(@RequestParam(required = false) Integer minAge,
-                                                                @RequestParam(required = false) Integer maxAge,
-                                                                @RequestParam(required = false) List<String> genders) {
-        return new ResponseEntity<>(userService.getUsersByCriteria(minAge, maxAge, genders), HttpStatus.OK);
+                                                                            @RequestParam(required = false) Integer maxAge,
+                                                                            @RequestParam(required = false) Float minRating,
+                                                                            @RequestParam(required = false) Float maxRating,
+                                                                            @RequestParam(required = false) List<String> genders) {
+        return new ResponseEntity<>(userService.getUsersByCriteria(minAge, maxAge, minRating, maxRating, genders), HttpStatus.OK);
     }
 }

@@ -26,8 +26,13 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("SELECT u FROM User u WHERE " +
             "(u.age >= :minAge) AND " +
             "(u.age <= :maxAge) AND " +
-            "(:genders IS NULL OR u.gender IN :genders)")
+            "(:genders IS NULL OR u.gender IN :genders) AND " +
+            "(u.rating >= :minRating) AND " +
+            "(u.rating <= :maxRating)")
     List<User> findByCriteria(@Param("minAge") Integer minAge,
                               @Param("maxAge") Integer maxAge,
-                              @Param("genders") List<String> genders);
+                              @Param("minRating") Float minRating,
+                              @Param("maxRating") Float maxRating,
+                              @Param("genders") List<String> genders
+                             );
 }
