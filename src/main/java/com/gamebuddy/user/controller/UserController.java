@@ -94,6 +94,17 @@ public class UserController {
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
+    @Operation(summary = "Get all friends",
+            description = "Retrieves a list of friends by user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Users retrieved successfully"),
+            @ApiResponse(responseCode = "204", description = "No users found")
+    })
+    @GetMapping("/getFriends")
+    public ResponseEntity<DataResult<List<UserViewDTO>>> getAllFriends(@RequestParam String userId) {
+        return new ResponseEntity<>(userService.getFriends(userId), HttpStatus.OK);
+    }
+
     @Operation(summary = "Delete a user",
             description = "Deletes the user based on the provided user ID.")
     @ApiResponses(value = {

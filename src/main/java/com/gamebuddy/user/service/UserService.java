@@ -17,9 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -72,6 +72,22 @@ public class UserService {
         createAndSaveFriendship(friend, friendCreateDTO.getUserId());
 
         return new SuccessResult("Friendship completed.");
+    }
+
+    public DataResult<List<UserViewDTO>> getFriends(String userId){
+        LOGGER.info("[getFriends] UserId: {}",userId);
+        List<FriendShip> friendShips = friendRepository.findByUserId(userId);
+
+        List<User> friendList = new ArrayList<>();
+        for (FriendShip friendShip : friendShips){
+            User user = this.userRepository.findByUserId(friendShip.getFriendShipId());
+            friendList.add(user);
+        }
+        List<UserViewDTO> userViewDTOs = friendList.stream()
+                .map(user -> modelMapper.map(user, UserViewDTO.class))
+                .collect(Collectors.toList());
+        return new SuccessDataResult<>(userViewDTOs, "All friends retrieved successfully.");
+
     }
 
     private void createAndSaveFriendship(User user, String friendId) {
