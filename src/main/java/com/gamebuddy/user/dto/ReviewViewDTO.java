@@ -1,5 +1,6 @@
 package com.gamebuddy.user.dto;
 
+import com.gamebuddy.user.model.Confirmation;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -12,5 +13,7 @@ public class ReviewViewDTO {
     private String reviewedUserId;
     private int rating;
     private String comment;
+    private Confirmation genderConfirmation;
+    private Confirmation ageConfirmation;
     private LocalDateTime createdAt;
 }

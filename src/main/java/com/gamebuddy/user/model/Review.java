@@ -1,8 +1,6 @@
 package com.gamebuddy.user.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,6 +24,12 @@ public class Review {
     private int rating;
 
     private String comment;
+
+    @Enumerated(EnumType.STRING)
+    private Confirmation genderConfirmation;
+
+    @Enumerated(EnumType.STRING)
+    private Confirmation ageConfirmation;
 
     private LocalDateTime createdAt;
 }
