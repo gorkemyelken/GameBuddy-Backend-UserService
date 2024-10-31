@@ -58,8 +58,8 @@ public class UserService {
     }
 
     @Transactional
-    public Result addFriend(String userId, FriendCreateDTO friendCreateDTO) {
-        User user = userRepository.findByUserId(userId);
+    public Result addFriend(FriendCreateDTO friendCreateDTO) {
+        User user = userRepository.findByUserId(friendCreateDTO.getUserId());
 
         User friend = userRepository.findByUserId(friendCreateDTO.getFriendId());
 

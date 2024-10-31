@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class FriendCreateDTO {
+    private String userId;
     private String friendId;
 }
