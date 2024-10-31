@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -76,7 +77,7 @@ public class UserService {
 
     public DataResult<List<UserViewDTO>> getFriends(String userId){
         LOGGER.info("[getFriends] UserId: {}",userId);
-        List<FriendShip> friendShips = friendRepository.findByUserId(userId);
+        Set<FriendShip> friendShips = friendRepository.findByUser_UserId(userId);
 
         List<User> friendList = new ArrayList<>();
         for (FriendShip friendShip : friendShips){

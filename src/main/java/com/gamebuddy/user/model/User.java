@@ -16,16 +16,16 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer","handler","friendShips"})
-@EqualsAndHashCode(onlyExplicitlyIncluded = true) // Use only explicitly included fields
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
 
     @Id
     @Column(updatable = false, nullable = false)
-    @EqualsAndHashCode.Include // Include userId in hashCode/equals
+    @EqualsAndHashCode.Include
     private String userId;
 
     @Column(unique = true)
-    @EqualsAndHashCode.Include // Include userName in hashCode/equals
+    @EqualsAndHashCode.Include
     private String userName;
 
     private String email;
@@ -43,6 +43,6 @@ public class User {
     private Float averageRating;
 
     @OneToMany(mappedBy = "user")
-    @JsonIgnore // Prevent serialization issues
+    @JsonIgnore
     private Set<FriendShip> friendShips;
 }
