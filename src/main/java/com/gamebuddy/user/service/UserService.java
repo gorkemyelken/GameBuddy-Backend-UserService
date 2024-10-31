@@ -186,7 +186,7 @@ public class UserService {
     }
 
     private String isValidUser(UserCreateDTO userCreateDTO) {
-        if(checkIfEmailValid(userCreateDTO.getEmail())){
+        if(!checkIfEmailValid(userCreateDTO.getEmail())){
             return "Email not valid.";
         }
 
