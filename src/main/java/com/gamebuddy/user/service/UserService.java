@@ -183,7 +183,7 @@ public class UserService {
         user.setUserId(UUID.randomUUID().toString());
         user.setPassword(userCreateDTO.getPassword());
         user.setPremium(false);
-        user.setProfilePhoto(null);
+        user.setProfilePhoto("https://yyamimarlik.s3.eu-north-1.amazonaws.com/gamebuddy-logo.png");
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(null);
         user.setPreferredLanguages(null);
