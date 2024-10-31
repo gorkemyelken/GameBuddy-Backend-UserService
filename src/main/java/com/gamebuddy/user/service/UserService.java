@@ -5,6 +5,7 @@ import com.gamebuddy.user.dto.UserUpdateDTO;
 import com.gamebuddy.user.dto.UserViewDTO;
 import com.gamebuddy.user.dto.auth.RegisterResponse;
 import com.gamebuddy.user.exception.results.*;
+import com.gamebuddy.user.model.Gender;
 import com.gamebuddy.user.model.User;
 import com.gamebuddy.user.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -35,29 +36,33 @@ public class UserService {
     }
 
     public DataResult<RegisterResponse> registerUser(UserCreateDTO userCreateDTO) {
-        LOGGER.info("Register User start.");
+        LOGGER.info("[registerUser] UserCreateDTO: {}",userCreateDTO);
         String validationMessage = isValidUser(userCreateDTO);
         if (validationMessage != null) {
             return new ErrorDataResult<>(validationMessage);
         }
+        LOGGER.info("[registerUser] User valid.");
         User user = createUser(userCreateDTO);
         userRepository.save(user);
+        LOGGER.info("[registerUser] User added to database. User: {}", user);
         RegisterResponse registerResponse = new RegisterResponse();
         registerResponse.setUserId(user.getUserId());
         return new SuccessDataResult<>(registerResponse, "User added successfully.");
     }
 
-    public DataResult<UserViewDTO> findByUsername(String username) {
-        if(!checkIfUserNameExists(username)){
+    public DataResult<UserViewDTO> findByUsername(String userName) {
+        LOGGER.info("[findByUsername] UserName: {}",userName);
+        if(!checkIfUserNameExists(userName)){
             return new ErrorDataResult<>("User not found.");
         }else{
-            User user = userRepository.findByUserName(username);
+            User user = userRepository.findByUserName(userName);
             UserViewDTO userViewDTO = modelMapper.map(user, UserViewDTO.class);
             return new SuccessDataResult<>(userViewDTO, "User found successfully.");
         }
     }
 
     public DataResult<UserViewDTO> updateUser(String userId, UserUpdateDTO userUpdateDTO) {
+        LOGGER.info("[updateUser] UserId: {} , UserUpdateDTO: {}",userId,userUpdateDTO);
         if(!checkIfUserIdExists(userId)){
             return new ErrorDataResult<>("User not found.");
         }
@@ -65,38 +70,46 @@ public class UserService {
 
         if (userUpdateDTO.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(userUpdateDTO.getPassword()));
+            LOGGER.info("[updateUser] Password is changed.");
         }
 
         if (userUpdateDTO.getGender() != null) {
             user.setGender(userUpdateDTO.getGender());
-            if(user.getGender().equals("MALE")){
-                user.setProfilePhoto("https://yyamimarlik.s3.eu-north-1.amazonaws.com/Male+Avatar.jpeg");
+            LOGGER.info("[updateUser] Gender is changed. New gender is {}", userUpdateDTO.getGender());
+            if(userUpdateDTO.getGender() == Gender.MALE){
+                user.setProfilePhoto("https://yyamimarlik.s3.eu-north-1.amazonaws.com/Male+Avatar.png");
+                LOGGER.info("[updateUser] Profile photo is changed. MALE");
             }
-            if(user.getGender().equals("FEMALE")){
-                user.setProfilePhoto("https://yyamimarlik.s3.eu-north-1.amazonaws.com/Female+Avatar.jpeg");
+            if(userUpdateDTO.getGender() == Gender.FEMALE){
+                user.setProfilePhoto("https://yyamimarlik.s3.eu-north-1.amazonaws.com/Female+Avatar.png");
+                LOGGER.info("[updateUser] Profile photo is changed. FEMALE");
             }
         }
 
         if (userUpdateDTO.getAge() != null) {
             user.setAge(userUpdateDTO.getAge());
+            LOGGER.info("[updateUser] Age is changed. New age is {}", userUpdateDTO.getAge());
         }
 
         if (userUpdateDTO.getProfilePhoto() != null && user.isPremium()) {
             user.setProfilePhoto(userUpdateDTO.getProfilePhoto());
+            LOGGER.info("[updateUser] ProfilePhoto is changed. New profilePhoto is {}", userUpdateDTO.getProfilePhoto());
         }
 
         if(userUpdateDTO.getPreferredLanguages() != null){
             user.setPreferredLanguages(userUpdateDTO.getPreferredLanguages());
+            LOGGER.info("[updateUser] PreferredLanguages is changed. New preferredLanguages is {}", userUpdateDTO.getPreferredLanguages());
         }
 
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
-
+        LOGGER.info("[updateUser] User added to database. User: {}", user);
         UserViewDTO userViewDTO = modelMapper.map(user, UserViewDTO.class);
         return new SuccessDataResult<>(userViewDTO, "User updated successfully.");
     }
 
     public DataResult<UserViewDTO> getUserByUserId(String userId) {
+        LOGGER.info("[getUserByUserId] UserId: {}",userId);
         if(!checkIfUserIdExists(userId)){
             return new ErrorDataResult<>("User not found.");
         }
@@ -106,6 +119,7 @@ public class UserService {
     }
 
     public DataResult<List<UserViewDTO>> getAllUsers() {
+        LOGGER.info("[getAllUsers]");
         List<User> users = userRepository.findAll();
         if(users.isEmpty()){
             return new ErrorDataResult<>("Users not found.");
@@ -117,6 +131,7 @@ public class UserService {
     }
 
     public Result deleteUser(String userId) {
+        LOGGER.info("[deleteUser] UserId: {}",userId);
         if(!checkIfUserIdExists(userId)){
             return new ErrorResult("User not found.");
         }
@@ -125,6 +140,7 @@ public class UserService {
     }
 
     public DataResult<UserViewDTO> makeUserPremium(String userId) {
+        LOGGER.info("[makeUserPremium] UserId: {}",userId);
         if(!checkIfUserIdExists(userId)){
             return new ErrorDataResult<>("User not found.");
         }
@@ -155,6 +171,7 @@ public class UserService {
     }
 
     public Result matchPassword(String userName, String password) {
+        LOGGER.info("[matchPassword] UserName: {}",userName);
         if(!checkIfUserNameExists(userName)){
             return new ErrorResult("User not found.");
         }
