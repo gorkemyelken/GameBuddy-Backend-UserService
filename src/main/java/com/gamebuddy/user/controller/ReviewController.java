@@ -59,4 +59,16 @@ public class ReviewController {
     public ResponseEntity<Result> deleteReview(@Parameter(description = "ID of the review to be deleted") @PathVariable String reviewId) {
         return new ResponseEntity<>(reviewService.deleteReview(reviewId), HttpStatus.OK);
     }
+
+    @Operation(summary = "Get review by reviewedUserId",
+            description = "Retrieves the review details for the given userId.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Review found"),
+            @ApiResponse(responseCode = "404", description = "Review not found")
+    })
+    @GetMapping("/users/{reviewedUserId}")
+    public ResponseEntity<DataResult<ReviewViewDTO>> getReviewByReviewedUserId(
+            @Parameter(description = "ID of the reviewedUsedId to be retrieved") @PathVariable String reviewedUserId) {
+        return new ResponseEntity<>(reviewService.getReviewByReviewId(reviewedUserId), HttpStatus.OK);
+    }
 }

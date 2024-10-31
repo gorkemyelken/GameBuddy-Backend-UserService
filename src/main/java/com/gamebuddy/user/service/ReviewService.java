@@ -60,7 +60,7 @@ public class ReviewService {
     public DataResult<ReviewViewDTO> getReviewByReviewedUserId(String reviewedUserId){
         LOGGER.info("[getReviewByReviewedUserId] ReviewedUserId: {}",reviewedUserId);
         if(!checkIfReviewedUserIdExists(reviewedUserId)){
-            return new ErrorDataResult<>("Review not found.");
+            return new ErrorDataResult<>("ReviewedUser not found.");
         }
         Review review = reviewRepository.findByReviewedUserId(reviewedUserId);
         ReviewViewDTO reviewViewDTO = modelMapper.map(review, ReviewViewDTO.class);
