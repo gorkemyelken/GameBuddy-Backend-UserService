@@ -9,7 +9,7 @@ import com.gamebuddy.user.exception.results.*;
 import com.gamebuddy.user.model.FriendShip;
 import com.gamebuddy.user.model.Gender;
 import com.gamebuddy.user.model.User;
-import com.gamebuddy.user.repository.FriendRepository;
+import com.gamebuddy.user.repository.FriendShipRepository;
 import com.gamebuddy.user.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -31,14 +31,14 @@ public class UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
 
-    private final FriendRepository friendRepository;
+    private final FriendShipRepository friendShipRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, FriendRepository friendRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, FriendShipRepository friendShipRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.friendRepository = friendRepository;
+        this.friendShipRepository = friendShipRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
     }
@@ -78,7 +78,7 @@ public class UserService {
     public DataResult<List<UserViewDTO>> getFriends(String userId) {
         LOGGER.info("[getFriends] UserId: {}", userId);
 
-        Set<FriendShip> friendShips = friendRepository.findByUser_UserId(userId);
+        Set<FriendShip> friendShips = friendShipRepository.findByUser_UserId(userId);
 
         if (friendShips.isEmpty()) {
             LOGGER.info("No friends found for UserId: {}", userId);
@@ -87,7 +87,7 @@ public class UserService {
 
         List<User> friendList = new ArrayList<>();
         for (FriendShip friendShip : friendShips) {
-            User user = this.userRepository.findByUserId(friendShip.getFriendId()); 
+            User user = this.userRepository.findByUserId(friendShip.getFriendId());
             if (user != null) {
                 friendList.add(user);
             } else {
@@ -110,7 +110,7 @@ public class UserService {
         newFriendship.setFriendId(friendId);
 
         user.getFriendShips().add(newFriendship);
-        friendRepository.save(newFriendship);
+        friendShipRepository.save(newFriendship);
         userRepository.save(user);
     }
 

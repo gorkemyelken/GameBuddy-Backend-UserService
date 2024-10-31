@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Set;
 
 @Repository
-public interface FriendRepository extends JpaRepository<FriendShip, String> {
+public interface FriendShipRepository extends JpaRepository<FriendShip, String> {
     Set<FriendShip> findByUser_UserId(String userId);
 }
